@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text.Json;
 using Npgsql;
@@ -247,9 +248,40 @@ public sealed class ChurchRepository
             (!values.TryGetValue("amount", out var amount) || amount is not decimal number || number <= 0 || number > 10000000))
             throw new ArgumentException("El monto debe ser mayor que cero y estar dentro del límite permitido.");
         foreach (var pair in values)
-            if (pair.Value is string text && text.Length > (pair.Key == "notes" ? 4000 : 500))
+            if (pair.Value is string text && text.Length > MaximumLength(resource, pair.Key))
                 throw new ArgumentException($"El campo '{pair.Key}' excede la longitud permitida.");
+        if (values.TryGetValue("email", out var email) && email is string address && !string.IsNullOrWhiteSpace(address))
+        {
+            try { _ = new MailAddress(address); }
+            catch (FormatException) { throw new ArgumentException("El correo electrónico no tiene un formato válido."); }
+        }
+        if (values.TryGetValue("direction", out var direction) && direction is string movement &&
+            movement is not ("Ingreso" or "Egreso"))
+            throw new ArgumentException("La operación debe ser Ingreso o Egreso.");
+        if (values.TryGetValue("status", out var status) && status is string state)
+        {
+            var allowed = resource.ToLowerInvariant() switch
+            {
+                "members" => new[] { "Activo", "Inactivo", "Visitante" },
+                "attendance" => new[] { "Presente", "Ausente" },
+                "pastoral" => new[] { "Pendiente", "En seguimiento", "Cerrado" },
+                _ => Array.Empty<string>()
+            };
+            if (allowed.Length > 0 && !allowed.Contains(state, StringComparer.Ordinal))
+                throw new ArgumentException("El estado indicado no es válido.");
+        }
     }
+
+    private static int MaximumLength(string resource, string field) => (resource.ToLowerInvariant(), field) switch
+    {
+        ("members", "full_name") => 180, ("members", "phone") => 40, ("members", "email") => 254, ("members", "status") => 24,
+        ("groups", "name") => 160, ("groups", "description") => 1000, ("groups", "leader_name") => 180, ("groups", "meeting_schedule") => 180,
+        ("services", "name") => 180, ("services", "location") => 180, ("services", "notes") => 2000,
+        ("resources", "title") => 240, ("resources", "description") => 2000, ("resources", "speaker") => 180,
+        ("treasury", "category") => 80, ("treasury", "description") => 500, ("treasury", "member_name") => 180,
+        ("pastoral", "subject") => 180, ("pastoral", "assigned_to") => 180, ("pastoral", "status") => 24, ("pastoral", "notes") => 4000,
+        (_, "notes") => 2000, _ => 500
+    };
 
     private async Task<NpgsqlConnection> OpenAsync(CancellationToken cancellationToken)
     {

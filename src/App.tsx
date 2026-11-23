@@ -78,7 +78,8 @@ export default function App({ token, userName, authError, onSignIn, onSignOut, o
   const [attendanceForm, setAttendanceForm] = useState({ service_id: '', member_id: '', status: 'Presente' });
   const module = modules[section];
 
-  const signInConfigured = Boolean(import.meta.env.VITE_ENTRA_CLIENT_ID && import.meta.env.VITE_ENTRA_TENANT_ID);
+  const signInConfigured = Boolean(import.meta.env.VITE_ENTRA_CLIENT_ID &&
+    import.meta.env.VITE_ENTRA_TENANT_ID && import.meta.env.VITE_ENTRA_API_SCOPE);
   const refresh = useCallback(async () => {
     setError('');
     if (!module || !token) { setRows([]); return; }

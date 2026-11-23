@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Npgsql;
 
 public sealed class ApiFunctions
 {
@@ -65,7 +66,10 @@ public sealed class ApiFunctions
             }
             return await Json(request, HttpStatusCode.OK, result);
         }
+        catch (JsonException) { return await Error(request, HttpStatusCode.BadRequest, "El contenido JSON no es válido."); }
         catch (ArgumentException exception) { return await Error(request, HttpStatusCode.BadRequest, exception.Message); }
+        catch (PostgresException exception) when (exception.SqlState is "23503" or "23505" or "23514")
+        { return await Error(request, HttpStatusCode.BadRequest, "El registro tiene referencias, valores o duplicados no permitidos."); }
         catch (KeyNotFoundException exception) { return await Error(request, HttpStatusCode.NotFound, exception.Message); }
         catch (Exception)
         {

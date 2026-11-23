@@ -13,7 +13,7 @@
 - Build: `npm.cmd run build` from root.
 - Dev: `npm.cmd run dev` from root; Vite prints its `localhost` URL.
 - API seam: `src/api.ts` and `src/config.ts`; set `VITE_API_BASE_URL` for the target API.
-- Auth: MSAL configuration in `src/main.tsx`; configure `VITE_ENTRA_CLIENT_ID`, `VITE_ENTRA_TENANT_ID`, `VITE_ENTRA_REDIRECT_URI`.
+- Auth: MSAL configuration in `src/main.tsx`; configure `VITE_ENTRA_CLIENT_ID`, `VITE_ENTRA_TENANT_ID`, `VITE_ENTRA_API_SCOPE`, `VITE_ENTRA_REDIRECT_URI`.
 - Mock files to delete: none. Mock datasets: none. Local persistent browser state: none. Do not copy data from `reference/prototype.html`.
 - Domain types live in `src/types.ts`; keep these application types and map API responses there if they diverge.
 

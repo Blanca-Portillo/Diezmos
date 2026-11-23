@@ -12,7 +12,7 @@ Requisitos: Node.js 20+, .NET 10 SDK, Azure Functions Core Tools v4, PostgreSQL 
 psql "$env:DATABASE_URL" -v ON_ERROR_STOP=1 -f services/api/migrations/001_initial_schema.sql
 ```
 
-Configure `.env.local` desde `.env.example` con `VITE_API_BASE_URL`, el client ID de la SPA y tenant ID de Entra ID. Registre una SPA de Entra ID y una API protegida con scope delegado `access_as_user`; asigne roles de aplicación `Admin`, `Treasury` y/o `Pastoral` según privilegio mínimo. El API `ENTRA_API_AUDIENCE` debe coincidir con `aud` del access token (`api://<api-client-id>`). `staticwebapp.config.json` contiene fallback de SPA y encabezados básicos; configure el dominio y políticas de despliegue durante el release.
+Configure `.env.local` desde `.env.example` con `VITE_API_BASE_URL`, el client ID de la SPA, tenant ID y `VITE_ENTRA_API_SCOPE` (por ejemplo, `api://<api-client-id>/access_as_user`). Registre una SPA de Entra ID y una API protegida con scope delegado `access_as_user`; asigne roles de aplicación `Admin`, `Treasury` y/o `Pastoral` según privilegio mínimo. El API `ENTRA_API_AUDIENCE` debe coincidir con `aud` del access token (`api://<api-client-id>`). `staticwebapp.config.json` contiene fallback de SPA y encabezados básicos; configure el dominio y políticas de despliegue durante el release.
 
 Terminal 1 (desde la raíz):
 

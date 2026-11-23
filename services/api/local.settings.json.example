@@ -6,6 +6,7 @@
     "DATABASE_URL": "Host=localhost;Port=5432;Database=diezmos;Username=postgres;Password=configure-locally",
     "ENTRA_TENANT_ID": "configure-tenant-id",
     "ENTRA_API_AUDIENCE": "api://configure-api-client-id",
-    "BLOB_CONTAINER": "church-resources"
+    "BLOB_CONTAINER": "church-resources",
+    "CORS_ALLOWED_ORIGIN": "http://localhost:5173"
   }
 }

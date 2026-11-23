@@ -8,6 +8,7 @@ import './styles.css';
 
 const clientId = import.meta.env.VITE_ENTRA_CLIENT_ID as string | undefined;
 const tenantId = import.meta.env.VITE_ENTRA_TENANT_ID as string | undefined;
+const apiScope = import.meta.env.VITE_ENTRA_API_SCOPE as string | undefined;
 const msal = clientId && tenantId ? new PublicClientApplication({
   auth: {
     clientId,
@@ -25,7 +26,8 @@ function AuthenticatedApp() {
 
   React.useEffect(() => {
     if (!account) { setToken(undefined); return; }
-    instance.acquireTokenSilent({ account, scopes: [`api://${clientId}/access_as_user`] })
+    if (!apiScope) { setToken(undefined); setAuthError('Configure VITE_ENTRA_API_SCOPE para solicitar acceso a la API.'); return; }
+    instance.acquireTokenSilent({ account, scopes: [apiScope] })
       .then(result => setToken(result.accessToken))
       .catch(() => setToken(undefined));
   }, [account, instance]);
@@ -34,7 +36,7 @@ function AuthenticatedApp() {
     token={token}
     authError={authError}
     userName={account?.name}
-    onSignIn={() => instance.loginRedirect({ scopes: [`api://${clientId}/access_as_user`] })}
+    onSignIn={() => instance.loginRedirect({ scopes: apiScope ? [apiScope] : [] })}
     onSignOut={() => { setToken(undefined); instance.logoutRedirect(); }}
     onAuthError={setAuthError}
   />;
