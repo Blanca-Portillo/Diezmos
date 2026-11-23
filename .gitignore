@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+services/api/local.settings.json
+services/api/bin/
+services/api/obj/
+.azure/.preview-temp/

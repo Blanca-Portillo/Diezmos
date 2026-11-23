@@ -1,6 +1,6 @@
 # Diezmos — Administración de iglesia local
 
-**Status**: Planning
+**Status**: Approved
 **Created**: 2026-11-23
 **Mode**: Interactive
 
