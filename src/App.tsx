@@ -12,7 +12,7 @@ interface Props {
   token?: string;
   userName?: string;
   authError?: string;
-  onSignIn?: () => void;
+  onSignIn?: (email?: string) => void;
   onSignOut?: () => void;
   onAuthError?: (message: string) => void;
 }
@@ -33,7 +33,9 @@ const displayDate = (value: unknown) => {
   }).format(date);
 };
 
-function Login({ configured, onSignIn, authError }: { configured: boolean; onSignIn?: () => void; authError?: string }) {
+function Login({ configured, onSignIn, authError }: { configured: boolean; onSignIn?: (email?: string) => void; authError?: string }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   return <main className="login-page">
     <section className="login-card">
       <div className="brand"><div className="brand-mark">✦</div><div>Diezmos<small>Administración de iglesia local</small></div></div>
@@ -41,9 +43,33 @@ function Login({ configured, onSignIn, authError }: { configured: boolean; onSig
       <p>Acceso privado para el equipo autorizado. Los datos se consultan y guardan en la API de la iglesia.</p>
       <div className="notice">{configured
         ? 'Inicie sesión con la cuenta administrativa asignada por su iglesia.'
-        : 'Autenticación pendiente de configuración. Configure Microsoft Entra ID en el entorno de la aplicación para habilitar el inicio de sesión.'}</div>
+        : 'Modo demostración web: permite revisar la interfaz. No representa autenticación segura ni datos persistentes.'}</div>
       {authError && <p className="error">{authError}</p>}
-      <Button appearance="primary" disabled={!configured} onClick={onSignIn}>Iniciar sesión</Button>
+      <form className="login-form" onSubmit={event => {
+        event.preventDefault();
+        onSignIn?.(email);
+      }}>
+        <label>Correo electrónico
+          <Input
+            type="email"
+            required
+            value={email}
+            onChange={(_, data) => setEmail(data.value)}
+            placeholder="administracion@iglesia.org"
+          />
+        </label>
+        <label>Contraseña
+          <Input
+            type="password"
+            required
+            value={password}
+            onChange={(_, data) => setPassword(data.value)}
+            placeholder="Mínimo 6 caracteres"
+            minLength={6}
+          />
+        </label>
+        <Button appearance="primary" type="submit" disabled={!email || password.length < 6}>Iniciar sesión</Button>
+      </form>
       <p>La información pastoral y financiera requiere permisos específicos.</p>
     </section>
   </main>;

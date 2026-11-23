@@ -18,6 +18,24 @@ const msal = clientId && tenantId ? new PublicClientApplication({
   cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
 }) : undefined;
 
+function DemoAuthenticatedApp() {
+  const [token, setToken] = React.useState<string>();
+  const [userName, setUserName] = React.useState('');
+
+  return <App
+    token={token}
+    userName={userName || undefined}
+    onSignIn={(email) => {
+      setUserName(email || 'Personal autorizado');
+      setToken('demo-local-session');
+    }}
+    onSignOut={() => {
+      setToken(undefined);
+      setUserName('');
+    }}
+  />;
+}
+
 function AuthenticatedApp() {
   const { instance, accounts } = useMsal();
   const account = accounts[0];
@@ -46,7 +64,9 @@ const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
   <React.StrictMode>
     <FluentProvider theme={webLightTheme}>
-      {msal ? <MsalProvider instance={msal}><AuthenticatedApp /></MsalProvider> : <App />}
+      {msal
+        ? <MsalProvider instance={msal}><AuthenticatedApp /></MsalProvider>
+        : <DemoAuthenticatedApp />}
     </FluentProvider>
   </React.StrictMode>
 );
